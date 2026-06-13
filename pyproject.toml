@@ -34,7 +34,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dennisrojaspereira/engmetrics-ai"
+Homepage = "https://engmetrics.ai"
+Documentation = "https://engmetrics.ai"
 Repository = "https://github.com/dennisrojaspereira/engmetrics-ai"
 Issues = "https://github.com/dennisrojaspereira/engmetrics-ai/issues"
 Changelog = "https://github.com/dennisrojaspereira/engmetrics-ai/blob/main/CHANGELOG.md"
