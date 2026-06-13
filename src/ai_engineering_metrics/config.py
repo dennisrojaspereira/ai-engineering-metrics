@@ -106,7 +106,7 @@ class Settings(BaseModel):
     def from_env(cls, *, load_dotenv_file: bool = True) -> Settings:
         if load_dotenv_file:
             # Explicitly load from cwd so the CLI works when installed via pipx
-            # and run from a project directory (e.g. `cd my-repo && ai-engineering-metrics analyze`).
+            # and run from any project directory.
             load_dotenv(dotenv_path=Path.cwd() / ".env")
 
         jira = JiraConfig(
