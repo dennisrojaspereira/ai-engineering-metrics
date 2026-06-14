@@ -11,6 +11,8 @@ from statistics import mean
 from ai_engineering_metrics.config import PricingConfig
 from ai_engineering_metrics.domain.models import (
     AIUsageMetrics,
+    Deployment,
+    DoraMetrics,
     ProductivityMetrics,
     PullRequest,
     ReworkMetrics,
@@ -108,6 +110,76 @@ def compute_rework(
         total_commits_after_review=sum(pr.commits_after_review for pr in prs),
         reverts_detected=sum(pr.reverts_detected for pr in prs),
         files_touched_again_later=_files_touched_again(stories),
+    )
+
+
+def _dora_deploy_freq_label(freq_per_day: float) -> str:
+    if freq_per_day >= 1.0:
+        return "elite"
+    if freq_per_day >= 1 / 7:
+        return "high"
+    if freq_per_day >= 1 / 30:
+        return "medium"
+    return "low"
+
+
+def _dora_lead_time_label(hours: float) -> str:
+    if hours < 1:
+        return "elite"
+    if hours < 168:
+        return "high"
+    if hours < 720:
+        return "medium"
+    return "low"
+
+
+def _dora_cfr_label(cfr: float) -> str:
+    if cfr <= 15:
+        return "elite"
+    if cfr <= 30:
+        return "high"
+    if cfr <= 45:
+        return "medium"
+    return "low"
+
+
+def _dora_mttr_label(hours: float) -> str:
+    if hours < 1:
+        return "elite"
+    if hours < 24:
+        return "high"
+    if hours < 168:
+        return "medium"
+    return "low"
+
+
+def compute_dora(deployments: list[Deployment], period_days: int = 30) -> DoraMetrics:
+    """Compute the four DORA metrics from a list of deployment events."""
+    if not deployments:
+        return DoraMetrics(period_days=period_days)
+
+    freq = len(deployments) / period_days if period_days else 0.0
+
+    lead_times = [d.lead_time_hours for d in deployments if d.lead_time_hours is not None]
+    avg_lead_time = round(mean(lead_times), 2) if lead_times else None
+
+    failures = [d for d in deployments if d.is_failure]
+    cfr = round(len(failures) / len(deployments) * 100, 2)
+
+    mttr_values = [d.mttr_hours for d in deployments if d.mttr_hours is not None]
+    avg_mttr = round(mean(mttr_values), 2) if mttr_values else None
+
+    return DoraMetrics(
+        deployment_frequency=round(freq, 4),
+        deployment_frequency_label=_dora_deploy_freq_label(freq),
+        lead_time_hours=avg_lead_time,
+        lead_time_label=_dora_lead_time_label(avg_lead_time) if avg_lead_time is not None else "unknown",
+        change_failure_rate=cfr,
+        change_failure_rate_label=_dora_cfr_label(cfr),
+        mttr_hours=avg_mttr,
+        mttr_label=_dora_mttr_label(avg_mttr) if avg_mttr is not None else "unknown",
+        deployments=deployments,
+        period_days=period_days,
     )
 
 

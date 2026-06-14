@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>engmetrics.ai — Measure the impact of AI on engineering delivery</title>
+<style>
+  :root {
+    --navy:    #1a1f2e;
+    --navy2:   #252b3b;
+    --blue:    #2323CC;
+    --blue-lt: #eeeeff;
+    --blue-dk: #1a1aaa;
+    --teal:    #2323CC;
+    --teal-lt: #eeeeff;
+    --teal-dk: #1a1aaa;
+    --green:   #059669;
+    --green-lt:#d1fae5;
+    --amber:   #d97706;
+    --red:     #dc2626;
+    --body:    #374151;
+    --muted:   #6b7280;
+    --light:   #f8fafc;
+    --line:    #e5e7eb;
+    --white:   #ffffff;
+    --ink:     #111827;
+    --shadow:  0 1px 3px rgba(0,0,0,.08), 0 8px 24px rgba(0,0,0,.06);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.05), 0 2px 8px rgba(0,0,0,.05);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--white);
+    color: var(--body);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.65;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-text { font-weight: 800; font-size: 17px; color: var(--navy); }
+  .logo-text span { color: var(--blue); }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { text-decoration: none; color: var(--body); font-size: 14px; font-weight: 500; transition: color .15s; }
+  .nav-links a:hover { color: var(--navy); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 700;
+    text-decoration: none; cursor: pointer; transition: all .18s; border: none;
+  }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-dk); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-teal { background: var(--blue); color: #fff; }
+  .btn-teal:hover { background: var(--blue-dk); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--navy); }
+  .btn-outline:hover { background: var(--navy); color: #fff; }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--white);
+    padding: 80px 48px 72px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--blue-lt); color: var(--blue-dk);
+    padding: 5px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(30px, 4vw, 48px); font-weight: 900;
+    line-height: 1.12; letter-spacing: -.025em;
+    color: var(--navy); margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p { font-size: 18px; color: var(--body); line-height: 1.7; margin-bottom: 32px; max-width: 480px; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+  .hero-note { font-size: 13px; color: var(--muted); }
+  .hero-note code { background: var(--teal-lt); color: var(--teal-dk); padding: 2px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+
+  /* terminal card on hero right */
+  .hero-terminal {
+    background: #1a2332; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 20px 48px rgba(0,0,0,.18);
+  }
+  .terminal-bar {
+    background: #141d2b; padding: 12px 16px;
+    display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,.07);
+  }
+  .t-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .terminal-body { padding: 20px 22px; font-family: "JetBrains Mono", "Fira Code", monospace; font-size: 13px; line-height: 1.85; }
+  .t-c { color: #4b5563; }
+  .t-p { color: #0ea5e9; font-weight: 700; }
+  .t-k { color: #34d399; }
+  .t-s { color: #fbbf24; }
+  .t-o { color: #c084fc; }
+  .t-w { color: #f1f5f9; }
+  .t-ok { color: #34d399; }
+
+  /* ── STATS BAR ── */
+  .stats-bar { background: var(--navy); padding: 32px 48px; }
+  .stats-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 24px; }
+  .stat { text-align: center; }
+  .stat-num { font-size: 36px; font-weight: 900; color: #fff; display: block; }
+  .stat-lbl { font-size: 13px; color: #93c5fd; margin-top: 2px; }
+
+  /* ── GENERIC SECTION ── */
+  .section { padding: 80px 48px; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-gray { background: var(--light); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .tag { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+  .h2 { font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; letter-spacing: -.02em; color: var(--navy); line-height: 1.15; margin-bottom: 12px; }
+  .lead { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 580px; }
+  .center { text-align: center; }
+  .center .lead { margin: 0 auto; }
+
+  /* ── HOW IT WORKS ── */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 48px; }
+  .step {
+    background: var(--white); border: 1px solid var(--line); border-radius: 14px;
+    padding: 28px 24px; box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .step:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+  .step-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--blue-lt); color: var(--blue-dk);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 18px;
+  }
+  .step-num { font-size: 11px; font-weight: 800; color: var(--blue); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .step h3 { font-size: 16px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--body); line-height: 1.6; }
+  .step-code {
+    margin-top: 14px; background: #1a2332; border-radius: 8px;
+    padding: 10px 14px; font-family: monospace; font-size: 11.5px;
+    color: #34d399; line-height: 1.65;
+  }
+
+  /* ── DASHBOARD PREVIEW ── */
+  .mockup-wrap {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,.1);
+    margin-top: 48px;
+  }
+  .browser-chrome {
+    background: #f3f4f6; border-bottom: 1px solid var(--line);
+    height: 40px; display: flex; align-items: center; padding: 0 16px; gap: 8px;
+  }
+  .bc-dot { width: 11px; height: 11px; border-radius: 50%; }
+  .bc-url {
+    flex: 1; background: var(--white); border: 1px solid var(--line);
+    border-radius: 6px; height: 24px; margin: 0 12px;
+    display: flex; align-items: center; padding: 0 12px;
+    font-size: 11px; color: var(--muted); font-family: monospace;
+  }
+  .db-inner { padding: 20px; background: linear-gradient(180deg, #faf9ff 0%, #f3f0fb 100%); }
+
+  /* dashboard header */
+  .db-hdr {
+    background: linear-gradient(120deg, #4c1d95, #6d28d9 60%, #a78bfa);
+    color: #fff; border-radius: 12px; padding: 20px 22px; margin-bottom: 14px;
+    position: relative; overflow: hidden;
+  }
+  .db-hdr::after { content:""; position:absolute; right:-40px; top:-40px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,.07); }
+  .db-ey { font-size:10px; letter-spacing:.12em; text-transform:uppercase; opacity:.75; }
+  .db-epic-title { font-size:18px; font-weight:800; margin:3px 0 2px; }
+  .db-s { font-size:12px; opacity:.8; }
+  .db-chips { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .db-chip { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.2); padding:2px 9px; border-radius:999px; font-size:10px; }
+  .db-meta { display:flex; gap:20px; margin-top:10px; flex-wrap:wrap; font-size:11px; }
+  .db-meta b { display:block; font-size:13px; font-weight:800; }
+  .db-meta span { opacity:.7; }
+
+  /* db cards */
+  .db-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:12px; }
+  .dbc { background:#fff; border:1px solid #ece9f5; border-radius:10px; padding:12px 14px; }
+  .dbc.acc { background:linear-gradient(135deg,#6d28d9,#4c1d95); color:#fff; border:none; }
+  .dbc-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#6b7280; }
+  .dbc.acc .dbc-lbl { color:rgba(255,255,255,.75); }
+  .dbc-val { font-size:20px; font-weight:800; margin-top:4px; }
+  .dbc-hint { font-size:10px; color:#6b7280; margin-top:2px; }
+  .dbc.acc .dbc-hint { color:rgba(255,255,255,.7); }
+  .dg { color:#059669; }
+
+  /* db 2col */
+  .db-2col { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+  .db-panel { background:#fff; border:1px solid #ece9f5; border-radius:10px; padding:12px 14px; }
+  .db-pt { font-size:10px; font-weight:700; color:#4c1d95; margin-bottom:10px; }
+
+  .bc { display:flex; flex-direction:column; gap:7px; }
+  .br { display:flex; align-items:center; gap:7px; }
+  .bl { font-size:9px; font-weight:600; color:#6b7280; width:40px; text-align:right; flex-shrink:0; }
+  .bt { flex:1; background:#ede9fe; border-radius:3px; height:10px; overflow:hidden; }
+  .bf { height:100%; border-radius:3px; }
+  .bf.wo { background:#c4b5fd; }
+  .bf.sv { background:#059669; }
+  .bv { font-size:9px; font-weight:700; color:#6b7280; width:20px; }
+
+  /* db table */
+  .dbt { width:100%; border-collapse:collapse; font-size:10px; }
+  .dbt th { padding:5px 8px; text-align:left; color:#6b7280; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid #ece9f5; }
+  .dbt td { padding:6px 8px; border-bottom:1px solid #f5f3ff; }
+  .dbt tr:last-child td { border:none; }
+  .tag2 { display:inline-block; padding:1px 7px; border-radius:999px; font-size:9px; font-weight:700; }
+  .td { background:#d1fae5; color:#065f46; }
+  .tt { background:#f3f4f6; color:#374151; }
+  .tm { background:#ede9fe; color:#5b21b6; }
+  .to { background:#fef3c7; color:#92400e; }
+  .rd { width:6px; height:6px; border-radius:50%; display:inline-block; margin-right:3px; }
+  .rl { background:#059669; }
+  .rm { background:#d97706; }
+
+  /* ── ARTIFACTS ── */
+  .artifact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-top:48px; }
+  .art {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm);
+    transition: box-shadow .2s, transform .2s;
+  }
+  .art:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+  .art-hd {
+    padding: 16px 18px; font-weight: 800; font-size: 14px; color: var(--navy);
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--line); background: var(--light);
+  }
+  .art-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; background: var(--blue-lt); }
+  .art-body { padding: 16px 18px; }
+  .art-body pre { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--body); line-height: 1.7; white-space: pre-wrap; }
+  .ak { color: var(--teal-dk); font-weight: 600; }
+  .av { color: var(--green); }
+  .as { color: var(--amber); }
+  .ah { color: var(--muted); font-weight: 700; }
+
+  /* ── PREREQS ── */
+  .prereq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 48px; }
+  .prereq-card {
+    background: var(--white); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm);
+  }
+  .prereq-hd {
+    background: var(--navy); color: #fff;
+    padding: 22px 24px; display: flex; align-items: center; gap: 16px;
+  }
+  .prereq-hd-icon {
+    width: 46px; height: 46px; border-radius: 10px;
+    background: rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .prereq-hd h3 { font-size: 17px; font-weight: 800; margin-bottom: 3px; }
+  .prereq-hd p { font-size: 13px; color: #93c5fd; }
+  .prereq-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .ps { display: flex; gap: 14px; }
+  .ps-n {
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: var(--blue); color: #fff; font-weight: 900; font-size: 12px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+  .ps-b h4 { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+  .ps-b p { font-size: 13px; color: var(--body); line-height: 1.6; }
+  .ps-b a { color: var(--teal-dk); font-weight: 600; text-decoration: none; }
+  .ps-b a:hover { text-decoration: underline; }
+  .snip {
+    margin-top: 8px; background: #1a2332; border-radius: 7px;
+    padding: 9px 13px; font-family: monospace; font-size: 11.5px;
+    color: #34d399; line-height: 1.6;
+  }
+  .snip .c { color: #4b5563; }
+  .callout {
+    margin-top: 8px; background: var(--teal-lt); border-left: 3px solid var(--teal);
+    border-radius: 0 7px 7px 0; padding: 10px 12px;
+    font-size: 12px; color: var(--body); line-height: 1.55;
+  }
+  .callout strong { color: var(--navy); font-weight: 700; }
+
+  /* ── SETUP ── */
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 48px; }
+  .setup-list { display: flex; flex-direction: column; gap: 22px; }
+  .ss { display: flex; gap: 16px; }
+  .ss-n {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    background: var(--blue); color: #fff; font-weight: 900; font-size: 13px;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+  .ss-b h4 { font-size: 15px; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
+  .ss-b p { font-size: 14px; color: var(--body); line-height: 1.6; }
+  .ss-b code { background: var(--teal-lt); color: var(--teal-dk); padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; font-weight: 600; }
+  .code-card { background: #1a2332; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .code-hd { background: #141d2b; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 8px; }
+  .code-hd .d { width: 10px; height: 10px; border-radius: 50%; }
+  .code-hd .ti { font-size: 12px; color: #4b5563; margin-left: 6px; }
+  .code-card pre { padding: 20px 22px; font-family: "JetBrains Mono", monospace; font-size: 12.5px; line-height: 1.8; overflow-x: auto; color: #f1f5f9; }
+
+  /* ── CLI TABLE ── */
+  .cli-wrap { margin-top: 36px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .cli-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .cli-tbl th { padding: 12px 18px; text-align: left; background: var(--navy); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+  .cli-tbl td { padding: 12px 18px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .cli-tbl tr:last-child td { border: none; }
+  .cli-tbl tr:hover td { background: var(--light); }
+  .cli-tbl code { background: var(--teal-lt); color: var(--teal-dk); padding: 2px 8px; border-radius: 5px; font-family: monospace; font-size: 12px; font-weight: 700; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy); color: #93c5fd;
+    text-align: center; padding: 48px;
+  }
+  .footer-logo { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+  .footer-logo span { color: #818cf8; }
+  footer p { font-size: 14px; margin-bottom: 6px; }
+  footer a { color: #818cf8; text-decoration: none; }
+  footer a:hover { color: #fff; text-decoration: underline; }
+
+  /* ── LIVE DEMO IFRAME ── */
+  .demo-wrap { margin-top: 48px; }
+  .demo-iframe-clip {
+    position: relative; overflow: hidden;
+    height: 640px; background: #f3f0ff;
+  }
+  .demo-iframe-clip iframe {
+    width: 1440px; height: 900px;
+    border: none; pointer-events: none;
+    transform-origin: top left;
+    transform: scale(0.764);
+  }
+  .demo-fade {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 180px; pointer-events: none;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,.97));
+  }
+  .demo-cta-bar { text-align: center; margin-top: 36px; }
+  .demo-cta-bar p { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .demo-cta-bar code { background: var(--teal-lt); color: var(--teal-dk); padding: 2px 7px; border-radius: 5px; font-family: monospace; font-size: 12px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav, .hero, .stats-bar, .section { padding-left: 20px; padding-right: 20px; }
+    .hero-inner, .setup-grid, .prereq-grid { grid-template-columns: 1fr; }
+    .db-cards { grid-template-columns: repeat(2,1fr); }
+    .db-2col { grid-template-columns: 1fr; }
+    .nav-links > a:not(.btn) { display: none; }
+    .hero-terminal { display: none; }
+    .demo-iframe-clip { height: 340px; }
+    .demo-iframe-clip iframe { width: 760px; height: 800px; transform: scale(0.42); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <svg width="48" height="32" viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- E: three horizontal bars -->
+      <rect x="2"  y="4"  width="30" height="10" rx="2" fill="#2323CC"/>
+      <rect x="2"  y="27" width="30" height="10" rx="2" fill="#2323CC"/>
+      <rect x="2"  y="50" width="30" height="10" rx="2" fill="#2323CC"/>
+      <!-- M: two diagonals meeting in center, two vertical posts -->
+      <path d="M40 4 L40 60 L50 60 L50 28 L62 48 L74 28 L74 60 L84 60 L84 4 L72 4 L62 26 L52 4 Z" fill="#2323CC"/>
+    </svg>
+    <span class="logo-text" style="font-size:18px;font-weight:800;color:#1a1f2e;letter-spacing:-.01em;">engmetrics<span style="color:#2323CC;">.ai</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="demo.html" target="_blank">Live demo</a>
+    <a href="#prereqs">Prerequisites</a>
+    <a href="#setup">Setup</a>
+    <a href="https://github.com/dennisrojaspereira/engmetrics-ai">GitHub</a>
+    <a class="btn btn-primary" href="#setup">Get started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">⚡ Open source · MIT</div>
+      <h1>Measure the real impact of <span>AI</span> on your engineering team</h1>
+      <p>Connect your JIRA epic and GitHub repo. Get hours saved, AI token costs, PR quality and risk score in one interactive dashboard — in under 30 seconds.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#setup">Install with pipx →</a>
+        <a class="btn btn-teal" href="demo.html" target="_blank">&#9654; Try live demo</a>
+        <a class="btn btn-outline" href="https://github.com/dennisrojaspereira/engmetrics-ai">View on GitHub</a>
+      </div>
+      <div class="hero-note">
+        Try it now with no credentials: <code>ai-engineering-metrics analyze --mock</code>
+      </div>
+    </div>
+    <div class="hero-terminal">
+      <div class="terminal-bar">
+        <div class="t-dot" style="background:#ef4444;"></div>
+        <div class="t-dot" style="background:#f59e0b;"></div>
+        <div class="t-dot" style="background:#10b981;"></div>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-c"># install once</span></div>
+        <div><span class="t-p">$</span> <span class="t-k">pipx install</span> <span class="t-s">git+https://github.com/</span></div>
+        <div><span style="color:transparent">$</span>   <span class="t-s">dennisrojaspereira/engmetrics-ai.git</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-c"># try with no credentials</span></div>
+        <div><span class="t-p">$</span> <span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">--mock</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-c"># real epic from your project folder</span></div>
+        <div><span class="t-p">$</span> <span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">-e</span> <span class="t-s">KAN-4</span> <span class="t-o">--open</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-ok">✓</span> <span class="t-w">Analysis complete: KAN-4</span></div>
+        <div>  <span class="t-w">9.2h saved (40%)  ·  580k tokens  ·  Risk: 19.5</span></div>
+        <div>  <span class="t-k">reports/KAN-4/dashboard.html</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-num">40%</span><span class="stat-lbl">avg hours saved with AI</span></div>
+    <div class="stat"><span class="stat-num">30 s</span><span class="stat-lbl">to first dashboard</span></div>
+    <div class="stat"><span class="stat-num">4</span><span class="stat-lbl">artifacts per run</span></div>
+    <div class="stat"><span class="stat-num">0</span><span class="stat-lbl">config needed to try it</span></div>
+    <div class="stat"><span class="stat-num">MIT</span><span class="stat-lbl">open source license</span></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section section-gray" id="how">
+  <div class="section-inner">
+    <div class="tag">How it works</div>
+    <div class="h2">From epic to insights in four steps</div>
+    <div class="lead">No data warehouse, no SaaS signup. One CLI command pulls everything and writes a self-contained bundle to your project folder.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">📦</div>
+        <div class="step-num">Step 1</div>
+        <h3>Install once</h3>
+        <p>One pipx command puts the CLI on your PATH, isolated from your project dependencies. Works on macOS, Linux and Windows.</p>
+        <div class="step-code">pipx install git+https://github.com/<br>dennisrojaspereira/engmetrics-ai.git</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🔑</div>
+        <div class="step-num">Step 2</div>
+        <h3>Add a .env file</h3>
+        <p>Drop a <code style="font-family:monospace;font-size:12px;background:var(--teal-lt);color:var(--teal-dk);padding:1px 5px;border-radius:4px;">.env</code> in your project root with your JIRA credentials. GitHub uses the <code style="font-family:monospace;font-size:12px;background:var(--teal-lt);color:var(--teal-dk);padding:1px 5px;border-radius:4px;">gh</code> CLI you already have.</p>
+        <div class="step-code">JIRA_BASE_URL=https://co.atlassian.net<br>JIRA_EMAIL=you@company.com<br>JIRA_API_TOKEN=your-token</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🚀</div>
+        <div class="step-num">Step 3</div>
+        <h3>Run the analysis</h3>
+        <p>Point it at any JIRA epic key. It fetches stories, linked pull requests and AI token usage automatically.</p>
+        <div class="step-code">cd your-repo<br>ai-engineering-metrics analyze \<br>  --epic PROJ-42 --open</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📊</div>
+        <div class="step-num">Step 4</div>
+        <h3>Read the bundle</h3>
+        <p>A <code style="font-family:monospace;font-size:12px;background:var(--teal-lt);color:var(--teal-dk);padding:1px 5px;border-radius:4px;">reports/PROJ-42/</code> folder lands in your project with a dashboard, JSON and two CSVs ready to share.</p>
+        <div class="step-code">reports/PROJ-42/<br>├── dashboard.html<br>├── metrics.json<br>├── stories.csv<br>└── pull_requests.csv</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD PREVIEW -->
+<div class="section" id="preview">
+  <div class="section-inner">
+    <div class="center">
+      <div class="tag">Live example</div>
+      <div class="h2">This is what you actually get</div>
+      <div class="lead">Real output from <strong>KAN-4 "Update Libs Fintechops"</strong> — pulled live from JIRA + GitHub.</div>
+    </div>
+    <!-- Live iframe preview -->
+    <div class="mockup-wrap demo-wrap">
+      <div class="browser-chrome">
+        <div class="bc-dot" style="background:#ef4444;"></div>
+        <div class="bc-dot" style="background:#f59e0b;"></div>
+        <div class="bc-dot" style="background:#10b981;"></div>
+        <div class="bc-url">engmetrics.ai · Interactive Demo — DEMO-1</div>
+      </div>
+      <div class="demo-iframe-clip">
+        <iframe src="demo.html" scrolling="no" tabindex="-1" title="Interactive demo dashboard — DEMO-1"></iframe>
+        <div class="demo-fade"></div>
+      </div>
+    </div>
+    <div class="demo-cta-bar">
+      <a href="demo.html" target="_blank" class="btn btn-primary" style="font-size:15px;padding:14px 36px;">&#9654; Open interactive demo</a>
+      <p>Fully interactive &mdash; charts, PR details, risk gauge &mdash; no login required &middot; generated with <code>--mock</code></p>
+    </div>
+    <!-- hidden db-inner kept for structure but replaced by iframe above -->
+    <div class="db-inner" style="display:none;">
+        <div class="db-hdr">
+          <div class="db-ey">AI Engineering Metrics</div>
+          <div class="db-epic-title">KAN-4 · Update Libs Fintechops</div>
+          <div class="db-s">fintech-pos-api-aisdd · generated Jun 13 2026</div>
+          <div class="db-chips">
+            <span class="db-chip">In Progress</span>
+            <span class="db-chip">6 stories</span>
+            <span class="db-chip">9 PRs</span>
+          </div>
+          <div class="db-meta">
+            <div><b>9.2 h</b><span>hours saved</span></div>
+            <div><b>40%</b><span>savings rate</span></div>
+            <div><b>580 k</b><span>AI tokens</span></div>
+            <div><b>$3.48</b><span>AI cost</span></div>
+            <div><b>0.89 h</b><span>avg lead time</span></div>
+            <div><b>19.5/100</b><span>risk (low)</span></div>
+          </div>
+        </div>
+        <div class="db-cards">
+          <div class="dbc acc"><div class="dbc-lbl">Hours Saved</div><div class="dbc-val">9.2 h</div><div class="dbc-hint">23h → 13.8h</div></div>
+          <div class="dbc"><div class="dbc-lbl">Savings Rate</div><div class="dbc-val dg">40%</div><div class="dbc-hint">AI vs baseline</div></div>
+          <div class="dbc"><div class="dbc-lbl">AI Tokens</div><div class="dbc-val">580 k</div><div class="dbc-hint">≈ $3.48</div></div>
+          <div class="dbc"><div class="dbc-lbl">Risk Score</div><div class="dbc-val dg">19.5</div><div class="dbc-hint">low · 0 cycles</div></div>
+        </div>
+        <div class="db-2col">
+          <div class="db-panel">
+            <div class="db-pt">⏱ Hours per Story</div>
+            <div class="bc">
+              <div class="br"><div class="bl">KAN-9</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div class="bt"><div class="bf wo" style="width:100%;"></div></div><div class="bt"><div class="bf sv" style="width:40%;"></div></div></div><div class="bv">8h</div></div>
+              <div class="br"><div class="bl">KAN-6</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div class="bt"><div class="bf wo" style="width:62%;"></div></div><div class="bt"><div class="bf sv" style="width:25%;"></div></div></div><div class="bv">5h</div></div>
+              <div class="br"><div class="bl">KAN-5</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div class="bt"><div class="bf wo" style="width:38%;"></div></div><div class="bt"><div class="bf sv" style="width:15%;"></div></div></div><div class="bv">3h</div></div>
+              <div class="br"><div class="bl">KAN-7</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div class="bt"><div class="bf wo" style="width:38%;"></div></div><div class="bt"><div class="bf sv" style="width:15%;"></div></div></div><div class="bv">3h</div></div>
+              <div class="br"><div class="bl">KAN-8</div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div class="bt"><div class="bf wo" style="width:25%;"></div></div><div class="bt"><div class="bf sv" style="width:10%;"></div></div></div><div class="bv">2h</div></div>
+              <div style="display:flex;gap:12px;margin-top:7px;font-size:9px;color:#6b7280;">
+                <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#c4b5fd;margin-right:3px;"></span>Without AI</span>
+                <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#059669;margin-right:3px;"></span>Saved</span>
+              </div>
+            </div>
+          </div>
+          <div class="db-panel">
+            <div class="db-pt">📋 Stories</div>
+            <table class="dbt">
+              <thead><tr><th>Key</th><th>Status</th><th>Tokens</th><th>Saved</th><th>Risk</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:700;color:#4c1d95;">KAN-9</td><td><span class="tag2 td">Done</span></td><td>210 k</td><td style="color:#059669;font-weight:700;">3.2 h</td><td><span class="rd rm"></span>mod</td></tr>
+                <tr><td style="font-weight:700;color:#4c1d95;">KAN-6</td><td><span class="tag2 td">Done</span></td><td>142 k</td><td style="color:#059669;font-weight:700;">2.0 h</td><td><span class="rd rm"></span>mod</td></tr>
+                <tr><td style="font-weight:700;color:#4c1d95;">KAN-5</td><td><span class="tag2 td">Done</span></td><td>85 k</td><td style="color:#059669;font-weight:700;">1.2 h</td><td><span class="rd rm"></span>mod</td></tr>
+                <tr><td style="font-weight:700;color:#4c1d95;">KAN-7</td><td><span class="tag2 td">Done</span></td><td>60 k</td><td style="color:#059669;font-weight:700;">1.2 h</td><td><span class="rd rm"></span>mod</td></tr>
+                <tr><td style="font-weight:700;color:#4c1d95;">KAN-10</td><td><span class="tag2 tt">To Do</span></td><td>48 k</td><td style="color:#059669;font-weight:700;">0.8 h</td><td><span class="rd rm"></span>mod</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="db-panel">
+          <div class="db-pt">🔀 Pull Requests</div>
+          <table class="dbt">
+            <thead><tr><th>#</th><th>Title</th><th>Status</th><th>+/−</th><th>Cycles</th><th>Risk</th></tr></thead>
+            <tbody>
+              <tr><td style="color:#6b7280;">#9</td><td>chore(KAN-10): bump to v0.2.0 and pin dev dependency versions</td><td><span class="tag2 to">open</span></td><td style="color:#059669;">+4/−4</td><td>0</td><td><span class="rd rm"></span>33.6</td></tr>
+              <tr><td style="color:#6b7280;">#8</td><td>fix(KAN-9): adjust env defaults for Node 22 compatibility</td><td><span class="tag2 tm">merged</span></td><td style="color:#059669;">+2/−2</td><td>0</td><td><span class="rd rm"></span>33.6</td></tr>
+              <tr><td style="color:#6b7280;">#7</td><td>docs(KAN-8): update README to reflect new dependency versions</td><td><span class="tag2 tm">merged</span></td><td style="color:#059669;">+2/−2</td><td>0</td><td><span class="rd rm"></span>33.6</td></tr>
+              <tr><td style="color:#6b7280;">#4</td><td>test(KAN-5): add post-upgrade smoke tests for env config</td><td><span class="tag2 tm">merged</span></td><td style="color:#059669;">+39/−0</td><td>0</td><td><span class="rd rm"></span>33.6</td></tr>
+              <tr><td style="color:#6b7280;">#1</td><td>chore(deps): upgrade Node.js engine requirement to v22</td><td><span class="tag2 to">open</span></td><td style="color:#059669;">+1/−1</td><td>0</td><td><span class="rd rl"></span>8.6</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>
+</div><!-- /preview-section -->
+
+<!-- ARTIFACTS -->
+<div class="section section-gray" id="artifacts">
+  <div class="section-inner">
+    <div class="center">
+      <div class="tag">Output</div>
+      <div class="h2">Four artifacts, every run</div>
+      <div class="lead">Every <code style="font-family:monospace;background:var(--teal-lt);color:var(--teal-dk);padding:2px 7px;border-radius:5px;font-weight:700;">analyze</code> run writes a complete bundle to <code style="font-family:monospace;background:var(--teal-lt);color:var(--teal-dk);padding:2px 7px;border-radius:5px;font-weight:700;">reports/&lt;EPIC&gt;/</code>.</div>
+    </div>
+    <div class="artifact-grid">
+      <div class="art">
+        <div class="art-hd"><div class="art-icon">🌐</div>dashboard.html</div>
+        <div class="art-body"><pre>Interactive charts & tables.
+Open in any browser —
+no server required.
+
+• Productivity timeline
+• Hours saved per story
+• PR quality scorecards
+• Risk breakdown
+</pre></div>
+      </div>
+      <div class="art">
+        <div class="art-hd"><div class="art-icon">📊</div>metrics.json</div>
+        <div class="art-body"><pre><span class="ak">"productivity"</span>: {
+  <span class="ak">"hours_saved"</span>: <span class="av">9.2</span>,
+  <span class="ak">"savings_percent"</span>: <span class="av">40.0</span>
+},
+<span class="ak">"ai_usage"</span>: {
+  <span class="ak">"total_tokens"</span>: <span class="av">580000</span>,
+  <span class="ak">"estimated_cost"</span>: <span class="av">3.48</span>
+},
+<span class="ak">"risk"</span>: { <span class="ak">"score"</span>: <span class="av">19.5</span>, <span class="ak">"level"</span>: <span class="as">"low"</span> }</pre></div>
+      </div>
+      <div class="art">
+        <div class="art-hd"><div class="art-icon">📋</div>stories.csv</div>
+        <div class="art-body"><pre><span class="ah">key,status,sp,ai_tokens,saved_h</span>
+KAN-9,Done,8,210000,3.2
+KAN-6,Done,5,142000,2.0
+KAN-5,Done,3,85000,1.2
+KAN-7,Done,3,60000,1.2
+KAN-10,To Do,2,48000,0.8
+KAN-8,Done,2,35000,0.8</pre></div>
+      </div>
+      <div class="art">
+        <div class="art-hd"><div class="art-icon">🔀</div>pull_requests.csv</div>
+        <div class="art-body"><pre><span class="ah">linked_to,#,status,+,−,cycles</span>
+KAN-9,#8,merged,2,2,0
+KAN-8,#7,merged,2,2,0
+KAN-5,#4,merged,39,0,0
+KAN-10,#9,open,4,4,0
+KAN-4,#3,open,1,1,0
+KAN-4,#1,open,1,1,0</pre></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PREREQUISITES -->
+<div class="section" id="prereqs">
+  <div class="section-inner">
+    <div class="tag">Prerequisites</div>
+    <div class="h2">Two things you need before running</div>
+    <div class="lead">The CLI requires a JIRA API token and the GitHub CLI (<code style="font-family:monospace;background:var(--teal-lt);color:var(--teal-dk);padding:1px 6px;border-radius:4px;font-weight:700;">gh</code>). Here is exactly how to get both.</div>
+
+    <div class="prereq-grid">
+      <!-- JIRA -->
+      <div class="prereq-card">
+        <div class="prereq-hd">
+          <div class="prereq-hd-icon">🔑</div>
+          <div>
+            <h3>JIRA API Token</h3>
+            <p>Read epics and stories from your Atlassian workspace</p>
+          </div>
+        </div>
+        <div class="prereq-body">
+          <div class="ps">
+            <div class="ps-n">1</div>
+            <div class="ps-b">
+              <h4>Open your Atlassian account settings</h4>
+              <p>Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">id.atlassian.com → Security → API tokens</a> and log in with your JIRA email.</p>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">2</div>
+            <div class="ps-b">
+              <h4>Create a new API token</h4>
+              <p>Click <strong>Create API token</strong>, give it a label like <em>"engmetrics-ai"</em> and click <strong>Create</strong>.</p>
+              <div class="callout">
+                <strong>Important:</strong> copy the token immediately — it is displayed only once and cannot be recovered later.
+              </div>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">3</div>
+            <div class="ps-b">
+              <h4>Find your JIRA base URL</h4>
+              <p>It is the domain you see in the browser when logged in, e.g. <code style="font-family:monospace;font-size:12px;background:var(--teal-lt);color:var(--teal-dk);padding:1px 5px;border-radius:4px;">https://yourco.atlassian.net</code></p>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">4</div>
+            <div class="ps-b">
+              <h4>Add to your .env file</h4>
+              <div class="snip">JIRA_BASE_URL=https://yourco.atlassian.net<br>JIRA_EMAIL=you@company.com<br>JIRA_API_TOKEN=ATATT3x...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GitHub CLI -->
+      <div class="prereq-card">
+        <div class="prereq-hd">
+          <div class="prereq-hd-icon">🐙</div>
+          <div>
+            <h3>GitHub CLI (gh)</h3>
+            <p>Discover and enrich pull requests linked to each epic</p>
+          </div>
+        </div>
+        <div class="prereq-body">
+          <div class="ps">
+            <div class="ps-n">1</div>
+            <div class="ps-b">
+              <h4>Install the GitHub CLI</h4>
+              <p>Choose your OS:</p>
+              <div class="snip">
+                <span class="c"># macOS</span><br>
+                brew install gh<br><br>
+                <span class="c"># Windows</span><br>
+                winget install --id GitHub.cli<br><br>
+                <span class="c"># Ubuntu / Debian</span><br>
+                sudo apt install gh
+              </div>
+              <p style="margin-top:7px;font-size:12px;color:var(--muted);">All installers: <a href="https://cli.github.com" target="_blank">cli.github.com</a></p>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">2</div>
+            <div class="ps-b">
+              <h4>Authenticate with GitHub</h4>
+              <div class="snip">gh auth login</div>
+              <div class="callout">
+                <strong>Follow the prompts:</strong><br>
+                1. Choose <em>GitHub.com</em><br>
+                2. Choose <em>HTTPS</em><br>
+                3. Choose <em>Login with a web browser</em><br>
+                4. Paste the one-time code shown in your browser
+              </div>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">3</div>
+            <div class="ps-b">
+              <h4>Verify the authentication</h4>
+              <div class="snip">gh auth status<br><span class="c"># → ✓ Logged in to github.com</span></div>
+            </div>
+          </div>
+          <div class="ps">
+            <div class="ps-n">4</div>
+            <div class="ps-b">
+              <h4>Add your repo to .env</h4>
+              <div class="snip">GITHUB_ORG=your-github-org<br>GITHUB_REPOSITORIES=your-repo<br>GITHUB_SEARCH_ALL_REPOS=false</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP -->
+<div class="section section-gray" id="setup">
+  <div class="section-inner">
+    <div class="tag">Setup guide</div>
+    <div class="h2">Up and running in 5 minutes</div>
+    <div class="lead">Requires Python 3.12+, pipx, a JIRA API token and the GitHub CLI.</div>
+
+    <div class="setup-grid">
+      <div class="setup-list">
+        <div class="ss"><div class="ss-n">1</div><div class="ss-b"><h4>Install Python 3.12+</h4><p>Download from <a href="https://python.org" style="color:var(--teal-dk);font-weight:600;">python.org</a> or use your package manager. Check with <code>python --version</code>.</p></div></div>
+        <div class="ss"><div class="ss-n">2</div><div class="ss-b"><h4>Install pipx</h4><p>pipx installs CLI tools in isolated environments so they never conflict with your project dependencies.</p></div></div>
+        <div class="ss"><div class="ss-n">3</div><div class="ss-b"><h4>Install engmetrics-ai</h4><p>One command installs the CLI and adds <code>ai-engineering-metrics</code> to your PATH.</p></div></div>
+        <div class="ss"><div class="ss-n">4</div><div class="ss-b"><h4>Try the demo (zero config)</h4><p>Run with <code>--mock</code> to see a full dashboard with synthetic data. No JIRA or GitHub required.</p></div></div>
+        <div class="ss"><div class="ss-n">5</div><div class="ss-b"><h4>Analyze your real epic</h4><p>Run from inside your repo with a <code>.env</code> file. The tool reads it automatically and picks up the GitHub remote.</p></div></div>
+      </div>
+
+      <div class="code-card">
+        <div class="code-hd">
+          <div class="d" style="background:#ef4444;"></div>
+          <div class="d" style="background:#f59e0b;"></div>
+          <div class="d" style="background:#10b981;"></div>
+          <span class="ti">Terminal</span>
+        </div>
+        <pre><span style="color:#4b5563;"># 1. Install pipx</span>
+<span class="t-p">$</span> <span class="t-k">pip install</span> <span class="t-o">--user</span> pipx
+<span class="t-p">$</span> <span class="t-k">python -m pipx ensurepath</span>
+
+<span style="color:#4b5563;"># 2. Install the CLI</span>
+<span class="t-p">$</span> <span class="t-k">pipx install</span> <span class="t-s">git+https://github.com/dennisrojaspereira/engmetrics-ai.git</span>
+
+<span style="color:#4b5563;"># 3. Try the demo</span>
+<span class="t-p">$</span> <span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">--mock</span>
+
+<span style="color:#4b5563;"># 4. Create .env in your project folder</span>
+<span class="t-p">$</span> cat &gt; .env &lt;&lt;EOF
+JIRA_BASE_URL=<span class="t-s">https://yourco.atlassian.net</span>
+JIRA_EMAIL=<span class="t-s">you@company.com</span>
+JIRA_API_TOKEN=<span class="t-s">your-jira-api-token</span>
+GITHUB_ORG=<span class="t-s">your-org</span>
+GITHUB_REPOSITORIES=<span class="t-s">your-repo</span>
+EOF
+
+<span style="color:#4b5563;"># 5. Analyze your epic</span>
+<span class="t-p">$</span> cd <span class="t-s">your-repo</span>
+<span class="t-p">$</span> <span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">-e</span> <span class="t-s">PROJ-42</span> <span class="t-o">--open</span>
+
+<span class="t-ok">✓</span> <span class="t-w">Analysis complete: PROJ-42</span>
+  <span class="t-w">9.2h saved (40%)  ·  580k tokens  ·  Risk: 19.5 (low)</span>
+  <span class="t-k">reports/PROJ-42/dashboard.html ← opening...</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLI REFERENCE -->
+<div class="section" id="cli">
+  <div class="section-inner">
+    <div class="tag">CLI Reference</div>
+    <div class="h2">All flags</div>
+    <div class="cli-wrap">
+      <table class="cli-tbl">
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>--epic</code> / <code>-e</code></td><td><em>DEMO-1 (mock)</em></td><td>JIRA epic key to analyze, e.g. <code>PROJ-123</code></td></tr>
+          <tr><td><code>--mock</code></td><td>off</td><td>Use synthetic data — no credentials required</td></tr>
+          <tr><td><code>--output</code> / <code>-o</code></td><td><code>reports/</code></td><td>Base output directory. A sub-folder named after the epic is created inside</td></tr>
+          <tr><td><code>--format</code> / <code>-f</code></td><td><code>all</code></td><td><code>all</code> · <code>html</code> · <code>json</code> · <code>csv</code></td></tr>
+          <tr><td><code>--open</code></td><td>off</td><td>Open the generated dashboard in your browser when done</td></tr>
+          <tr><td><code>--stdout</code></td><td>off</td><td>Print metrics JSON to stdout — pipe to <code>jq</code></td></tr>
+          <tr><td><code>--repo</code> / <code>-r</code></td><td><em>auto</em></td><td>Override GitHub repo as <code>owner/name</code></td></tr>
+          <tr><td><code>--verbose</code> / <code>-v</code></td><td>off</td><td>Show every API call and PR-matching decision</td></tr>
+          <tr><td><code>--version</code></td><td>—</td><td>Print installed version and exit</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:24px;">
+      <div class="code-card">
+        <div class="code-hd">
+          <div class="d" style="background:#ef4444;"></div>
+          <div class="d" style="background:#f59e0b;"></div>
+          <div class="d" style="background:#10b981;"></div>
+          <span class="ti">Recipes</span>
+        </div>
+        <pre><span style="color:#4b5563;"># Pipe metrics to jq</span>
+<span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">-e</span> <span class="t-s">PROJ-123</span> <span class="t-o">--stdout</span> | jq .ai_usage
+
+<span style="color:#4b5563;"># HTML only, to a custom folder</span>
+<span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">-e</span> <span class="t-s">PROJ-123</span> <span class="t-o">-f</span> html <span class="t-o">-o</span> ./out
+
+<span style="color:#4b5563;"># Override GitHub repo</span>
+<span class="t-k">ai-engineering-metrics analyze</span> <span class="t-o">-e</span> <span class="t-s">PROJ-123</span> <span class="t-o">--repo</span> <span class="t-s">acme/backend</span>
+
+<span style="color:#4b5563;"># Update to the latest version</span>
+<span class="t-k">pipx upgrade</span> <span class="t-s">ai-engineering-metrics</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo" style="display:flex;align-items:center;justify-content:center;gap:12px;">
+    <svg width="40" height="26" viewBox="0 0 96 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2"  y="4"  width="30" height="10" rx="2" fill="#818cf8"/>
+      <rect x="2"  y="27" width="30" height="10" rx="2" fill="#818cf8"/>
+      <rect x="2"  y="50" width="30" height="10" rx="2" fill="#818cf8"/>
+      <path d="M40 4 L40 60 L50 60 L50 28 L62 48 L74 28 L74 60 L84 60 L84 4 L72 4 L62 26 L52 4 Z" fill="#818cf8"/>
+    </svg>
+    engmetrics<span>.ai</span>
+  </div>
+  <p>Measure the real impact of AI on your engineering delivery.</p>
+  <p style="margin-top:12px;">
+    <a href="https://github.com/dennisrojaspereira/engmetrics-ai">GitHub</a> &nbsp;·&nbsp;
+    <a href="https://github.com/dennisrojaspereira/engmetrics-ai/blob/main/CHANGELOG.md">Changelog</a> &nbsp;·&nbsp;
+    <a href="https://github.com/dennisrojaspereira/engmetrics-ai/issues">Issues</a> &nbsp;·&nbsp;
+    MIT License
+  </p>
+  <p style="margin-top:16px;font-size:12px;opacity:.5;">Built with Python · JIRA API · GitHub CLI · Plotly</p>
+</footer>
+
+</body>
+</html>

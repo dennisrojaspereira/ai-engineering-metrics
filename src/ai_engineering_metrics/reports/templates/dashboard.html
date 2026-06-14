@@ -168,6 +168,20 @@
   .btn-primary { background: var(--purple); color: #fff; }
   .btn-ghost { background: var(--purple-50); color: var(--purple-dark); }
   .modal-close { float: right; cursor: pointer; font-size: 20px; line-height: 1; opacity: .85; background: none; border: none; color: #fff; }
+
+  /* DORA level badges */
+  .dora-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+  .dora-elite { background: #dcfce7; color: #15803d; }
+  .dora-high  { background: #e0e7ff; color: #4338ca; }
+  .dora-medium { background: #fef3c7; color: #b45309; }
+  .dora-low   { background: #fee2e2; color: #dc2626; }
+  .dora-unknown { background: var(--purple-100); color: var(--muted); }
+
+  /* Deploy status in table */
+  .badge.success { background: #dcfce7; color: #15803d; }
+  .badge.failed  { background: #fee2e2; color: #dc2626; }
+  .badge.rolled_back { background: #fef3c7; color: #b45309; }
+
   @media (max-width: 980px) {
     .cards { grid-template-columns: repeat(2, 1fr); }
     .grid-2 { grid-template-columns: 1fr; }
@@ -243,6 +257,68 @@
       <div class="hint">{{ report.rework.total_review_cycles }} review cycles total</div>
     </div>
   </div>
+
+  <!-- ============================ DORA METRICS ======================== -->
+  {% if report.dora %}
+  <div class="section-title">DORA Metrics <span style="font-weight:400;color:var(--muted)">· DevOps Research & Assessment · last {{ report.dora.period_days }} days</span></div>
+  <div class="cards">
+    <div class="card">
+      <div class="label">Deployment Frequency</div>
+      <div class="value">{{ "%.2f"|format(report.dora.deployment_frequency * 7) }}<span style="font-size:16px;font-weight:400"> /week</span></div>
+      <div class="hint"><span class="dora-badge dora-{{ report.dora.deployment_frequency_label }}">{{ report.dora.deployment_frequency_label | capitalize }}</span> &nbsp; {{ report.dora.deployments|length }} deploys in {{ report.dora.period_days }} days</div>
+    </div>
+    <div class="card">
+      <div class="label">Lead Time for Changes</div>
+      {% if report.dora.lead_time_hours is not none %}
+      <div class="value">{{ report.dora.lead_time_hours | f1 }} h</div>
+      <div class="hint"><span class="dora-badge dora-{{ report.dora.lead_time_label }}">{{ report.dora.lead_time_label | capitalize }}</span> &nbsp; {{ "%.1f"|format(report.dora.lead_time_hours / 24) }} days avg commit→deploy</div>
+      {% else %}
+      <div class="value"><span class="na">—</span></div>
+      <div class="hint">No lead time data</div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <div class="label">Change Failure Rate</div>
+      <div class="value">{{ report.dora.change_failure_rate | f1 }}%</div>
+      <div class="hint"><span class="dora-badge dora-{{ report.dora.change_failure_rate_label }}">{{ report.dora.change_failure_rate_label | capitalize }}</span> &nbsp; {{ report.dora.deployments | selectattr('is_failure') | list | length }} of {{ report.dora.deployments|length }} failed</div>
+    </div>
+    <div class="card">
+      <div class="label">Mean Time to Restore</div>
+      {% if report.dora.mttr_hours is not none %}
+      <div class="value">{{ report.dora.mttr_hours | f1 }} h</div>
+      <div class="hint"><span class="dora-badge dora-{{ report.dora.mttr_label }}">{{ report.dora.mttr_label | capitalize }}</span> &nbsp; {{ report.dora.deployments | selectattr('mttr_hours') | list | length }} incident(s) recovered</div>
+      {% else %}
+      <div class="value"><span class="na">—</span></div>
+      <div class="hint">No incidents in period</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- DORA deployments table -->
+  <div class="section-title">Deployments <span style="font-weight:400;color:var(--muted)">· production · last {{ report.dora.period_days }} days</span></div>
+  <div class="panel">
+    <table>
+      <thead><tr>
+        <th>Deploy</th><th>Environment</th><th>Deployed At</th><th>PRs included</th>
+        <th>Triggered by</th><th class="num">Lead Time</th><th>Status</th><th class="num">MTTR</th>
+      </tr></thead>
+      <tbody>
+        {% for d in report.dora.deployments %}
+        <tr>
+          <td><b>{{ d.id }}</b></td>
+          <td>{{ d.environment }}</td>
+          <td>{{ d.deployed_at.strftime("%Y-%m-%d %H:%M UTC") }}</td>
+          <td>{% if d.pr_numbers %}{% for n in d.pr_numbers %}#{{ n }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}<span class="na">—</span>{% endif %}</td>
+          <td>{{ d.triggered_by or "—" }}</td>
+          <td class="num">{% if d.lead_time_hours is not none %}{{ d.lead_time_hours | f1 }} h{% else %}<span class="na">—</span>{% endif %}</td>
+          <td><span class="badge {{ d.status }}">{{ d.status }}</span></td>
+          <td class="num">{% if d.mttr_hours is not none %}{{ d.mttr_hours | f1 }} h{% else %}<span class="na">—</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
 
   <!-- ============================ CHARTS ============================= -->
   <div class="section-title">AI usage & productivity</div>
@@ -459,7 +535,8 @@
     document.getElementById("m-notes").innerHTML = (pr.notes || []).map(n => "<li>" + esc(n) + "</li>").join("");
 
     const link = document.getElementById("m-link");
-    if (pr.url) { link.href = pr.url; link.style.display = ""; } else { link.style.display = "none"; }
+    link.href = pr.url || ("https://github.com/" + pr.repository + "/pull/" + pr.number);
+    link.style.display = "";
 
     overlay.classList.add("open");
   }

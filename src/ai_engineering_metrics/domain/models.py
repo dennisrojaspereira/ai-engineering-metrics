@@ -202,6 +202,46 @@ class PullRequestRisk(BaseModel):
     components: list[RiskComponent] = Field(default_factory=list)
 
 
+class Deployment(BaseModel):
+    """A single deployment event to a target environment (usually production)."""
+
+    id: str
+    environment: str = "production"
+    deployed_at: datetime
+    pr_numbers: list[int] = Field(default_factory=list)
+    triggered_by: str | None = None
+    lead_time_hours: float | None = None  # first commit → deployed_at
+    status: str = "success"  # success | failed | rolled_back
+    incident_detected_at: datetime | None = None
+    incident_resolved_at: datetime | None = None
+
+    @property
+    def mttr_hours(self) -> float | None:
+        if self.incident_detected_at and self.incident_resolved_at:
+            delta = self.incident_resolved_at - self.incident_detected_at
+            return round(delta.total_seconds() / 3600, 2)
+        return None
+
+    @property
+    def is_failure(self) -> bool:
+        return self.status in ("failed", "rolled_back")
+
+
+class DoraMetrics(BaseModel):
+    """The four DORA (DevOps Research and Assessment) key metrics."""
+
+    deployment_frequency: float = 0.0  # deployments per day
+    deployment_frequency_label: str = "unknown"  # elite | high | medium | low
+    lead_time_hours: float | None = None  # avg commit→production hours
+    lead_time_label: str = "unknown"
+    change_failure_rate: float = 0.0  # 0..100 percent
+    change_failure_rate_label: str = "unknown"
+    mttr_hours: float | None = None  # mean time to restore in hours
+    mttr_label: str = "unknown"
+    deployments: list[Deployment] = Field(default_factory=list)
+    period_days: int = 30
+
+
 class EpicReport(BaseModel):
     """The full analysis result. This is what the CLI, API or agent returns."""
 
@@ -217,6 +257,7 @@ class EpicReport(BaseModel):
     pr_risks: list[PullRequestRisk] = Field(default_factory=list)
     # PRs that reference the epic key directly (not tied to a single story).
     epic_pull_requests: list[PullRequest] = Field(default_factory=list)
+    dora: DoraMetrics | None = None
 
     @property
     def all_pull_requests(self) -> list[PullRequest]:

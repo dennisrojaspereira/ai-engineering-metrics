@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
 
-from ai_engineering_metrics.domain.models import Epic, PullRequest, QualityMetrics, Story
+from ai_engineering_metrics.domain.models import Deployment, Epic, PullRequest, QualityMetrics, Story
 
 _BASE = datetime(2026, 5, 1, 9, 0, tzinfo=UTC)
 
@@ -278,6 +278,90 @@ def _stories() -> list[Story]:
     ]
 
 
+def _deployments() -> list[Deployment]:
+    """Eight simulated production deployments spanning the 30-day epic window.
+
+    One deployment (deploy-002) triggers an incident to give realistic DORA
+    numbers: Freq=High, Lead Time=High, CFR=Elite, MTTR=High.
+    """
+    return [
+        Deployment(
+            id="deploy-001",
+            environment="production",
+            deployed_at=_dt(6, 10),
+            pr_numbers=[1421],
+            triggered_by="anamuller",
+            lead_time_hours=73.0,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-002",
+            environment="production",
+            deployed_at=_dt(9, 9),
+            pr_numbers=[1437, 884],
+            triggered_by="anamuller",
+            lead_time_hours=60.0,
+            status="failed",
+            incident_detected_at=_dt(9, 11),
+            incident_resolved_at=_dt(9, 15),  # MTTR = 4 h
+        ),
+        Deployment(
+            id="deploy-003",
+            environment="production",
+            deployed_at=_dt(12, 9),
+            pr_numbers=[901],
+            triggered_by="liu-wei",
+            lead_time_hours=48.0,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-004",
+            environment="production",
+            deployed_at=_dt(15, 11),
+            pr_numbers=[1455, 948],
+            triggered_by="pedro-souza",
+            lead_time_hours=110.0,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-005",
+            environment="production",
+            deployed_at=_dt(18, 10),
+            pr_numbers=[],
+            triggered_by="ci-bot",
+            lead_time_hours=None,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-006",
+            environment="production",
+            deployed_at=_dt(21, 14),
+            pr_numbers=[915],
+            triggered_by="sara-nilsson",
+            lead_time_hours=144.0,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-007",
+            environment="production",
+            deployed_at=_dt(24, 10),
+            pr_numbers=[921],
+            triggered_by="ci-bot",
+            lead_time_hours=168.0,
+            status="success",
+        ),
+        Deployment(
+            id="deploy-008",
+            environment="production",
+            deployed_at=_dt(28, 10),
+            pr_numbers=[],
+            triggered_by="ci-bot",
+            lead_time_hours=None,
+            status="success",
+        ),
+    ]
+
+
 def _quality() -> QualityMetrics:
     return QualityMetrics(
         cyclomatic_complexity=14.2,
@@ -323,3 +407,10 @@ class MockQualityClient:
 
     def get_quality_metrics(self) -> QualityMetrics:
         return _quality()
+
+
+class MockDeploymentClient:
+    """Stand-in deployment source returning simulated production deployments."""
+
+    def get_deployments(self, period_days: int = 30) -> list[Deployment]:
+        return _deployments()

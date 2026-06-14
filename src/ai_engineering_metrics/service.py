@@ -28,6 +28,7 @@ from ai_engineering_metrics.integrations.quality_client import (
     NullQualityClient,
 )
 from ai_engineering_metrics.mock.mock_data import (
+    MockDeploymentClient,
     MockIssueClient,
     MockPullRequestClient,
     MockQualityClient,
@@ -43,11 +44,13 @@ class AnalysisService:
         issue_source: IssueSource,
         pr_source: PullRequestSource,
         quality_source: QualitySource,
+        deployment_source=None,
     ) -> None:
         self._settings = settings
         self._issues = issue_source
         self._prs = pr_source
         self._quality = quality_source
+        self._deployments = deployment_source
 
     # ------------------------------------------------------------- factories
     @classmethod
@@ -60,6 +63,7 @@ class AnalysisService:
                 MockIssueClient(),
                 MockPullRequestClient(),
                 MockQualityClient(),
+                MockDeploymentClient(),
             )
 
         quality: QualitySource
@@ -151,6 +155,14 @@ class AnalysisService:
         # Epic-level PRs have no single owning story; attribute zero per-PR tokens.
         pr_risks.extend(risk.compute_pr_risk(pr, 0, quality) for pr in epic_prs)
 
+        dora = None
+        if self._deployments is not None:
+            try:
+                deployments = self._deployments.get_deployments()
+                dora = metrics.compute_dora(deployments)
+            except Exception as exc:
+                logger.warning("DORA metrics unavailable: %s", exc)
+
         return EpicReport(
             generated_at=datetime.now(UTC),
             epic=epic,
@@ -163,6 +175,7 @@ class AnalysisService:
             story_risks=story_risks,
             pr_risks=pr_risks,
             epic_pull_requests=epic_prs,
+            dora=dora,
         )
 
     def _apply_simulated_story_points(self, stories: list) -> None:

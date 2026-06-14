@@ -168,20 +168,6 @@
   .btn-primary { background: var(--purple); color: #fff; }
   .btn-ghost { background: var(--purple-50); color: var(--purple-dark); }
   .modal-close { float: right; cursor: pointer; font-size: 20px; line-height: 1; opacity: .85; background: none; border: none; color: #fff; }
-
-  /* DORA level badges */
-  .dora-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .03em; }
-  .dora-elite { background: #dcfce7; color: #15803d; }
-  .dora-high  { background: #e0e7ff; color: #4338ca; }
-  .dora-medium { background: #fef3c7; color: #b45309; }
-  .dora-low   { background: #fee2e2; color: #dc2626; }
-  .dora-unknown { background: var(--purple-100); color: var(--muted); }
-
-  /* Deploy status in table */
-  .badge.success { background: #dcfce7; color: #15803d; }
-  .badge.failed  { background: #fee2e2; color: #dc2626; }
-  .badge.rolled_back { background: #fef3c7; color: #b45309; }
-
   @media (max-width: 980px) {
     .cards { grid-template-columns: repeat(2, 1fr); }
     .grid-2 { grid-template-columns: 1fr; }
@@ -207,7 +193,7 @@
       <div><span>Pull requests</span><b>8</b></div>
       <div><span>Created</span><b>2026-05-01</b></div>
       <div><span>Updated</span><b>2026-05-31</b></div>
-      <div><span>Generated</span><b>2026-06-14 15:32 UTC</b></div>
+      <div><span>Generated</span><b>2026-06-13 13:56 UTC</b></div>
     </div>
   </header>
 
@@ -257,139 +243,6 @@
       <div class="hint">18 review cycles total</div>
     </div>
   </div>
-
-  <!-- ============================ DORA METRICS ======================== -->
-  
-  <div class="section-title">DORA Metrics <span style="font-weight:400;color:var(--muted)">· DevOps Research & Assessment · last 30 days</span></div>
-  <div class="cards">
-    <div class="card">
-      <div class="label">Deployment Frequency</div>
-      <div class="value">1.87<span style="font-size:16px;font-weight:400"> /week</span></div>
-      <div class="hint"><span class="dora-badge dora-high">High</span> &nbsp; 8 deploys in 30 days</div>
-    </div>
-    <div class="card">
-      <div class="label">Lead Time for Changes</div>
-      
-      <div class="value">100.5 h</div>
-      <div class="hint"><span class="dora-badge dora-high">High</span> &nbsp; 4.2 days avg commit→deploy</div>
-      
-    </div>
-    <div class="card">
-      <div class="label">Change Failure Rate</div>
-      <div class="value">12.5%</div>
-      <div class="hint"><span class="dora-badge dora-elite">Elite</span> &nbsp; 1 of 8 failed</div>
-    </div>
-    <div class="card">
-      <div class="label">Mean Time to Restore</div>
-      
-      <div class="value">4.0 h</div>
-      <div class="hint"><span class="dora-badge dora-high">High</span> &nbsp; 1 incident(s) recovered</div>
-      
-    </div>
-  </div>
-
-  <!-- DORA deployments table -->
-  <div class="section-title">Deployments <span style="font-weight:400;color:var(--muted)">· production · last 30 days</span></div>
-  <div class="panel">
-    <table>
-      <thead><tr>
-        <th>Deploy</th><th>Environment</th><th>Deployed At</th><th>PRs included</th>
-        <th>Triggered by</th><th class="num">Lead Time</th><th>Status</th><th class="num">MTTR</th>
-      </tr></thead>
-      <tbody>
-        
-        <tr>
-          <td><b>deploy-001</b></td>
-          <td>production</td>
-          <td>2026-05-07 10:00 UTC</td>
-          <td>#1421</td>
-          <td>anamuller</td>
-          <td class="num">73.0 h</td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-002</b></td>
-          <td>production</td>
-          <td>2026-05-10 09:00 UTC</td>
-          <td>#1437, #884</td>
-          <td>anamuller</td>
-          <td class="num">60.0 h</td>
-          <td><span class="badge failed">failed</span></td>
-          <td class="num">4.0 h</td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-003</b></td>
-          <td>production</td>
-          <td>2026-05-13 09:00 UTC</td>
-          <td>#901</td>
-          <td>liu-wei</td>
-          <td class="num">48.0 h</td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-004</b></td>
-          <td>production</td>
-          <td>2026-05-16 11:00 UTC</td>
-          <td>#1455, #948</td>
-          <td>pedro-souza</td>
-          <td class="num">110.0 h</td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-005</b></td>
-          <td>production</td>
-          <td>2026-05-19 10:00 UTC</td>
-          <td><span class="na">—</span></td>
-          <td>ci-bot</td>
-          <td class="num"><span class="na">—</span></td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-006</b></td>
-          <td>production</td>
-          <td>2026-05-22 14:00 UTC</td>
-          <td>#915</td>
-          <td>sara-nilsson</td>
-          <td class="num">144.0 h</td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-007</b></td>
-          <td>production</td>
-          <td>2026-05-25 10:00 UTC</td>
-          <td>#921</td>
-          <td>ci-bot</td>
-          <td class="num">168.0 h</td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-        <tr>
-          <td><b>deploy-008</b></td>
-          <td>production</td>
-          <td>2026-05-29 10:00 UTC</td>
-          <td><span class="na">—</span></td>
-          <td>ci-bot</td>
-          <td class="num"><span class="na">—</span></td>
-          <td><span class="badge success">success</span></td>
-          <td class="num"><span class="na">—</span></td>
-        </tr>
-        
-      </tbody>
-    </table>
-  </div>
-  
 
   <!-- ============================ CHARTS ============================= -->
   <div class="section-title">AI usage & productivity</div>
@@ -573,131 +426,147 @@
       </tr></thead>
       <tbody>
         
-        <tr class="pr-row" data-key="acme/payments-api#1421" title="Click to see the evaluation">
-          <td><b>#1421</b></td>
-          <td>KAN-20002 Tokenise card vault</td>
-          <td>acme/payments-api</td>
-          <td>anamuller</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">940</td>
-          <td class="num">210</td>
-          <td class="num">18</td>
-          <td class="num">12</td>
-          <td class="num">14</td>
-          <td class="num">2</td>
-          <td class="num">53.0 h</td>
-          <td><span class="risk lvl-moderate"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/payments-api#1437" title="Click to see the evaluation">
-          <td><b>#1437</b></td>
-          <td>KAN-20002 Vault migration follow-up</td>
-          <td>acme/payments-api</td>
-          <td>anamuller</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">180</td>
-          <td class="num">40</td>
-          <td class="num">6</td>
-          <td class="num">4</td>
-          <td class="num">3</td>
-          <td class="num">0</td>
-          <td class="num">26.0 h</td>
-          <td><span class="risk lvl-moderate"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/web-storefront#884" title="Click to see the evaluation">
-          <td><b>#884</b></td>
-          <td>KAN-20003 One-click checkout flow</td>
-          <td>acme/web-storefront</td>
-          <td>liu-wei</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">1,860</td>
-          <td class="num">320</td>
-          <td class="num">34</td>
-          <td class="num">22</td>
-          <td class="num">28</td>
-          <td class="num">4</td>
-          <td class="num">105.0 h</td>
-          <td><span class="risk lvl-high"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/web-storefront#901" title="Click to see the evaluation">
-          <td><b>#901</b></td>
-          <td>KAN-20003 Fix checkout a11y</td>
-          <td>acme/web-storefront</td>
-          <td>liu-wei</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">120</td>
-          <td class="num">60</td>
-          <td class="num">5</td>
-          <td class="num">3</td>
-          <td class="num">2</td>
-          <td class="num">0</td>
-          <td class="num">28.0 h</td>
-          <td><span class="risk lvl-moderate"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/payments-api#1455" title="Click to see the evaluation">
-          <td><b>#1455</b></td>
-          <td>KAN-20004 Integrate fraud scoring</td>
-          <td>acme/payments-api</td>
-          <td>pedro-souza</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">1,320</td>
-          <td class="num">180</td>
-          <td class="num">24</td>
-          <td class="num">18</td>
-          <td class="num">21</td>
-          <td class="num">3</td>
-          <td class="num">147.0 h</td>
-          <td><span class="risk lvl-moderate"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/web-storefront#915" title="Click to see the evaluation">
-          <td><b>#915</b></td>
-          <td>KAN-20005 Emit checkout analytics</td>
-          <td>acme/web-storefront</td>
-          <td>sara-nilsson</td>
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#9" title="Click to see the evaluation">
+          <td><b>#9</b></td>
+          <td>chore(KAN-10): bump to v0.2.0 and pin dev dependency versions</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
           <td><span class="badge open">open</span></td>
-          <td class="num">430</td>
-          <td class="num">70</td>
-          <td class="num">11</td>
-          <td class="num">7</td>
-          <td class="num">6</td>
+          <td class="num">4</td>
+          <td class="num">4</td>
           <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
           <td class="num"><span class="na">—</span></td>
           <td><span class="risk lvl-low"><span class="dot"></span></span></td>
         </tr>
-        
-        <tr class="pr-row" data-key="acme/data-pipeline#921" title="Click to see the evaluation">
-          <td><b>#921</b></td>
-          <td>KAN-20005 Analytics schema tweak</td>
-          <td>acme/data-pipeline</td>
-          <td>sara-nilsson</td>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#8" title="Click to see the evaluation">
+          <td><b>#8</b></td>
+          <td>fix(KAN-9): adjust env defaults for Node 22 compatibility</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge merged">merged</span></td>
+          <td class="num">2</td>
+          <td class="num">2</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">0.24 h</td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#7" title="Click to see the evaluation">
+          <td><b>#7</b></td>
+          <td>docs(KAN-8): update README to reflect new dependency versions</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge merged">merged</span></td>
+          <td class="num">2</td>
+          <td class="num">2</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">0.29 h</td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#6" title="Click to see the evaluation">
+          <td><b>#6</b></td>
+          <td>chore(KAN-7): update tsconfig target and vitest timeouts for Node 22</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
           <td><span class="badge open">open</span></td>
-          <td class="num">90</td>
-          <td class="num">10</td>
-          <td class="num">3</td>
+          <td class="num">4</td>
+          <td class="num">4</td>
           <td class="num">2</td>
           <td class="num">1</td>
           <td class="num">0</td>
-          <td class="num"><span class="na">—</span></td>
-          <td><span class="risk lvl-moderate"><span class="dot"></span></span></td>
-        </tr>
-        
-        <tr class="pr-row" data-key="acme/web-storefront#948" title="Click to see the evaluation">
-          <td><b>#948</b></td>
-          <td>KAN-20006 Localise checkout strings</td>
-          <td>acme/web-storefront</td>
-          <td>anamuller</td>
-          <td><span class="badge merged">merged</span></td>
-          <td class="num">260</td>
-          <td class="num">30</td>
-          <td class="num">9</td>
-          <td class="num">5</td>
-          <td class="num">4</td>
           <td class="num">0</td>
-          <td class="num">49.0 h</td>
+          <td class="num"><span class="na">—</span></td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#5" title="Click to see the evaluation">
+          <td><b>#5</b></td>
+          <td>chore(KAN-6): audit project dependencies and add audit scripts</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge open">open</span></td>
+          <td class="num">24</td>
+          <td class="num">0</td>
+          <td class="num">2</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num"><span class="na">—</span></td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#4" title="Click to see the evaluation">
+          <td><b>#4</b></td>
+          <td>test(KAN-5): add post-upgrade smoke tests for env config</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge merged">merged</span></td>
+          <td class="num">39</td>
+          <td class="num">0</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num">0.37 h</td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#3" title="Click to see the evaluation">
+          <td><b>#3</b></td>
+          <td>chore(deps): upgrade @types/node to v22 [KAN-4]</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge open">open</span></td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num"><span class="na">—</span></td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#2" title="Click to see the evaluation">
+          <td><b>#2</b></td>
+          <td>chore(deps): upgrade TypeScript to 5.8.x [KAN-4]</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge open">open</span></td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num"><span class="na">—</span></td>
+          <td><span class="risk lvl-low"><span class="dot"></span></span></td>
+        </tr>
+
+        <tr class="pr-row" data-key="dennisrojaspereira/fintech-pos-api-aisdd#1" title="Click to see the evaluation">
+          <td><b>#1</b></td>
+          <td>chore(deps): upgrade Node.js engine requirement to v22 [KAN-4]</td>
+          <td>fintech-pos-api-aisdd</td>
+          <td>dennisrojaspereira</td>
+          <td><span class="badge open">open</span></td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">1</td>
+          <td class="num">0</td>
+          <td class="num">0</td>
+          <td class="num"><span class="na">—</span></td>
           <td><span class="risk lvl-low"><span class="dot"></span></span></td>
         </tr>
         
@@ -746,7 +615,7 @@
   </div>
 
   <div class="footer">
-    Generated by ai-engineering-metrics · 2026-06-14 15:32 UTC
+    Generated by ai-engineering-metrics · 2026-06-13 13:56 UTC
     · Quality source: mock
   </div>
 </div>
